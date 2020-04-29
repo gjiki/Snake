@@ -2,6 +2,7 @@ import * as CONFIG from "./config.js";
 
 var snake = null;
 var gameInterval = null;
+var lastButton = null;
 
 /**
  * Init fuction to call on window.onLoad
@@ -10,6 +11,30 @@ function init() {
     onkeydown = getKeyAndMove;
     snake = new Snake(CONFIG.SNAKE_DEFAULT_LENGTH);
     gameInterval = setInterval(play, CONFIG.INTERVAL);
+
+    document.getElementById("pause").addEventListener("click", pauseClick);
+    document.getElementById("start").addEventListener("click", startClick);
+}
+
+
+/**
+ * Event handler function for pause button click
+ */
+function pauseClick() {
+    if (lastButton != "pause") {
+        clearInterval(gameInterval);
+        lastButton = "pause";
+    }
+}
+
+/**
+ * Event handler function for start button click
+ */
+function startClick() {
+    if (lastButton != "start") {
+        gameInterval = setInterval(play, CONFIG.INTERVAL);
+        lastButton = "start";
+    }
 }
 
 class Snake {
@@ -87,7 +112,7 @@ class Snake {
     changeFoodCoordinates() {
         let food = document.getElementById("food");
         while (true) {
-            let limit = (CONFIG.BOARD_SIZE / CONFIG.SNAKE_CUBE_DIM);
+            let limit = ((CONFIG.BOARD_SIZE - 2 * CONFIG.BOARD_BORDER) / CONFIG.SNAKE_CUBE_DIM);
             let x = Math.floor(Math.random() * limit);
             let y = Math.floor(Math.random() * limit);
 
@@ -101,6 +126,20 @@ class Snake {
                 } else return;
             }
         }
+    }
+
+    /**
+     * Function to check if head collides any other body element
+     * Return type : Bool
+     * True if collides, false otherwise
+     */
+    checkCollision() {
+        for (let i = 1; i < this.body.length; i++) {
+            if (this.body[0][0] == this.body[i][0] && this.body[0][1] == this.body[i][1]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -164,10 +203,10 @@ function getKeyAndMove(e) {
             snake.changeDirection(key_code);
             break;
         case 80:
-            clearInterval(gameInterval);
+            pauseClick();
             break;
         case 83:
-            gameInterval = setInterval(play, CONFIG.INTERVAL);
+            startClick();
             break;
         default:
             break;
@@ -183,7 +222,6 @@ function play() {
 
     let head = document.getElementById("cube0");
     let food = document.getElementById("food");
-
 
     if (head.offsetLeft == food.offsetLeft && head.offsetTop == food.offsetTop) {
         snake.score++;
@@ -206,6 +244,9 @@ function play() {
         arr.push(newCube.offsetLeft);
         arr.push(newCube.offsetTop);
         snake.body.push(arr);
+
+        let score = document.getElementById('score');
+        score.value = "Score : " + snake.score;
     }
 }
 
@@ -241,6 +282,10 @@ function move() {
         if (!checkBounds(head)) {
             resetBoard();
         }
+
+        if (snake.checkCollision()) {
+            resetBoard();
+        }
     }
 }
 
@@ -252,10 +297,10 @@ function move() {
  */
 function checkBounds(elem) {
     if (elem.offsetLeft < 0 || elem.offsetTop < 0) return false;
-    if (elem.offsetLeft > (CONFIG.BOARD_SIZE - CONFIG.BOARD_BORDER) || elem.offsetTop > (CONFIG.BOARD_SIZE - CONFIG.BOARD_BORDER)) return false;
+    let limit = (CONFIG.BOARD_SIZE - 2 * CONFIG.BOARD_BORDER - CONFIG.SNAKE_CUBE_DIM);
+    if (elem.offsetLeft > limit || elem.offsetTop > limit) return false;
     return true;
 }
-
 
 /**
  * Reset board function
@@ -265,6 +310,7 @@ function resetBoard() {
     let board = document.getElementById("board");
     board.innerHTML = "";
     snake.resetSnake();
+    document.getElementById('score').value = "Score : 0";
 }
 
 window.onload = init;

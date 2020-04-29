@@ -9,18 +9,23 @@
 }
 
 .board-container {
+    width: 500px;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: 10px solid transparent;
-    border-color: #657;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    flex-direction: row;
 }
 
 .board {
     width: 320px;
     height: 320px;
     position: relative;
+    border: 10px solid transparent;
+    border-color: #657;
 }
 
 .cube {
@@ -36,4 +41,14 @@
 
 #food {
     background-color: red;
+}
+
+.settings {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+input {
+    text-align: center;
 }
