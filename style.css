@@ -33,3 +33,7 @@
     border: 1px solid transparent;
     border-color: grey;
 }
+
+#food {
+    background-color: red;
+}

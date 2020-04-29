@@ -15,7 +15,7 @@ function init() {
 class Snake {
     constructor(default_length) {
         this.body = [];
-        this.length = 0;
+        this.score = 0;
         this._direction = 0;
         this._default_length = default_length;
         this._createDefault();
@@ -37,10 +37,20 @@ class Snake {
     }
 
     /**
+     * Create snake game default board
+     * With snake body and food
+     */
+    _createDefault() {
+        this._createDefaultSnake();
+        this.createFood();
+        this.score = 0;
+    }
+
+    /**
      * Create snake default body
      * Length = default_length
      */
-    _createDefault() {
+    _createDefaultSnake() {
         for (let i = 0; i < this._default_length; i++) {
             let cubeId = 'cube' + i;
             let cube = this._createOneCube(cubeId);
@@ -53,6 +63,41 @@ class Snake {
             arr.push(cube.offsetTop);
             this.body.push(arr);
         }
+    }
+
+    /**
+     * Create food for snake
+     * Give random coordinates(different from snake body)
+     * Add on board
+     */
+    createFood() {
+        let food = document.createElement("div");
+        food.setAttribute('class', 'cube');
+        food.setAttribute('id', 'food');
+
+        let board = document.getElementById("board");
+        board.appendChild(food);
+        this.changeFoodCoordinates();
+    }
+
+    /**
+     * Change food coordinates on the board
+     * It must be different from snake's body coordinates at that time
+     */
+    changeFoodCoordinates() {
+        let food = document.getElementById("food");
+        let limit = (CONFIG.BOARD_SIZE / CONFIG.SNAKE_CUBE_DIM);
+        let x = Math.floor(Math.random() * limit);
+        let y = Math.floor(Math.random() * limit);
+
+        food.style.left = 0 + x * CONFIG.SNAKE_CUBE_DIM + "px";
+        food.style.top = 0 + y * CONFIG.SNAKE_CUBE_DIM + "px";
+    }
+
+    resetSnake() {
+        this.body = [];
+        this.changeDirection(0);
+        this._createDefault();
     }
 
     /**
@@ -119,17 +164,27 @@ function getKeyAndMove(e) {
  */
 function play() {
     move();
+
+    let head = document.getElementById("cube0");
+    let food = document.getElementById("food");
+
+
+    if (head.offsetLeft == food.offsetLeft && head.offsetTop == food.offsetTop) {
+        snake.score++;
+        snake.changeFoodCoordinates();
+    }
 }
 
 /**
  * Move snake to direction
- * Move every body element to its next one(starting from last)
+ * Move every body element to its next's place(starting from last)
  * Move head to its direction
  */
 function move() {
     let dir = snake.getDirection();
 
     if (dir != 0) {
+        // Move every cube to its next's place
         for (let i = snake.body.length - 1; i >= 1; i--) {
             let cube = document.getElementById('cube' + String(i));
             let frontCube = document.getElementById('cube' + String(i - 1));
@@ -137,22 +192,38 @@ function move() {
             cube.style.top = frontCube.style.top;
         }
 
-        let elem = document.getElementById("cube0");
-        elem.style.left = parseInt(elem.offsetLeft) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][0]) + "px";
-        elem.style.top = parseInt(elem.offsetTop) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][1]) + "px";
+        // get head cube of the snake
+        let head = document.getElementById("cube0");
+        head.style.left = parseInt(head.offsetLeft) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][0]) + "px";
+        head.style.top = parseInt(head.offsetTop) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][1]) + "px";
+
+        if (!checkBounds(head)) {
+            resetBoard();
+        }
     }
 }
 
 /**
  * Check if element(cube) is in bounds
  * @param {Object} elem - element to check   
- * return 1 if in bounds
- * 0 otherwise
+ * return true if in bounds
+ * false otherwise
  */
 function checkBounds(elem) {
-    if (elem.offsetLeft < 0 || elem.offsetTop < 0) return 0;
-    if (elem.offsetLeft > 510 || elem.offsetTop > 510) return 0;
-    return 1;
+    if (elem.offsetLeft < 0 || elem.offsetTop < 0) return false;
+    if (elem.offsetLeft > (CONFIG.BOARD_SIZE - CONFIG.BOARD_BORDER) || elem.offsetTop > (CONFIG.BOARD_SIZE - CONFIG.BOARD_BORDER)) return false;
+    return true;
+}
+
+
+/**
+ * Reset board function
+ * Remove all cubes, create default starting snake
+ */
+function resetBoard() {
+    let board = document.getElementById("board");
+    board.innerHTML = "";
+    snake.resetSnake();
 }
 
 window.onload = init;
