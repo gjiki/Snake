@@ -15,6 +15,7 @@ function init() {
 class Snake {
     constructor(default_length) {
         this.body = [];
+        this.length = 0;
         this.score = 0;
         this._direction = 0;
         this._default_length = default_length;
@@ -61,6 +62,8 @@ class Snake {
             let arr = []
             arr.push(cube.offsetLeft);
             arr.push(cube.offsetTop);
+
+            this.length++;
             this.body.push(arr);
         }
     }
@@ -94,8 +97,15 @@ class Snake {
         food.style.top = 0 + y * CONFIG.SNAKE_CUBE_DIM + "px";
     }
 
+    /**
+     * Reset snake values :
+     *      Body
+     *      Direction
+     *      Score
+     */
     resetSnake() {
         this.body = [];
+        this.score = 0;
         this.changeDirection(0);
         this._createDefault();
     }
@@ -172,6 +182,25 @@ function play() {
     if (head.offsetLeft == food.offsetLeft && head.offsetTop == food.offsetTop) {
         snake.score++;
         snake.changeFoodCoordinates();
+
+        let lastCube = document.getElementById('cube' + String(snake.body.length - 1));
+        let lastOffsetLeft = lastCube.offsetLeft;
+        let lastOffsetTop = lastCube.offsetTop;
+
+        let newCube = document.createElement('div');
+        newCube.setAttribute('class', 'cube');
+        newCube.setAttribute('id', 'cube' + String(snake.body.length));
+
+        let board = document.getElementById('board');
+        board.appendChild(newCube);
+        newCube.style.left = 0 + lastOffsetLeft + "px";
+        newCube.style.top = 0 + lastOffsetTop + "px";
+
+        let arr = []
+        arr.push(newCube.offsetLeft);
+        arr.push(newCube.offsetTop);
+        this.length++;
+        snake.body.push(arr);
     }
 }
 
