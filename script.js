@@ -216,15 +216,20 @@ function move() {
         // Move every cube to its next's place
         for (let i = snake.body.length - 1; i >= 1; i--) {
             let cube = document.getElementById('cube' + String(i));
-            let frontCube = document.getElementById('cube' + String(i - 1));
-            cube.style.left = frontCube.style.left;
-            cube.style.top = frontCube.style.top;
+            cube.style.left = snake.body[i - 1][0] + "px";
+            cube.style.top = snake.body[i - 1][1] + "px";
+
+            snake.body[i][0] = cube.offsetLeft;
+            snake.body[i][1] = cube.offsetTop;
         }
 
         // get head cube of the snake
         let head = document.getElementById("cube0");
         head.style.left = parseInt(head.offsetLeft) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][0]) + "px";
         head.style.top = parseInt(head.offsetTop) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][1]) + "px";
+
+        snake.body[0][0] = head.offsetLeft;
+        snake.body[0][1] = head.offsetTop;
 
         if (!checkBounds(head)) {
             resetBoard();
