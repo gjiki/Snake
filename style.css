@@ -1,0 +1,35 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.board-section {
+    background-color: black;
+}
+
+.board-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 10px solid transparent;
+    border-color: #657;
+}
+
+.board {
+    width: 320px;
+    height: 320px;
+    position: relative;
+}
+
+.cube {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    border: 1px solid transparent;
+    border-color: grey;
+}
