@@ -3,6 +3,9 @@ import * as CONFIG from "./config.js";
 var snake = null;
 var gameInterval = null;
 
+/**
+ * Init fuction to call on window.onLoad
+ */
 function init() {
     onkeydown = getKeyAndMove;
     snake = new Snake(CONFIG.SNAKE_DEFAULT_LENGTH);
@@ -14,16 +17,20 @@ class Snake {
         this.body = [];
         this.length = 0;
         this.direction = 0;
-        this.default_length = default_length;
+        this._default_length = default_length;
         this._createDefault();
     }
 
+    /**
+     * Create snake default body
+     * Length = default_length
+     */
     _createDefault() {
-        for (let i = 0; i < this.default_length; i++) {
+        for (let i = 0; i < this._default_length; i++) {
             let cubeId = 'cube' + i;
             let cube = this._createOneCube(cubeId);
 
-            cube.style.left = parseInt(cube.offsetLeft) + (this.default_length - i - 1) * CONFIG.SNAKE_CUBE_DIM + "px";
+            cube.style.left = parseInt(cube.offsetLeft) + (this._default_length - i - 1) * CONFIG.SNAKE_CUBE_DIM + "px";
             cube.style.top = 0 + "px";
 
             let arr = []
@@ -31,9 +38,13 @@ class Snake {
             arr.push(cube.offsetTop);
             this.body.push(arr);
         }
-        console.log(this.body);
     }
 
+    /**
+     * Create one cube element and add to board div
+     * @param {String} id - create new element with this id
+     * return created cube
+     */
     _createOneCube(id) {
         let cube = document.createElement("div");
         cube.setAttribute('id', id);
@@ -45,6 +56,7 @@ class Snake {
     }
 }
 
+// Direction vectors for keyCode values
 const DIRECTIONS = {
     0: [0, 0],
     37: [-1, 0], // left
@@ -53,26 +65,50 @@ const DIRECTIONS = {
     40: [0, 1] // down
 }
 
+/**
+ * Check which key is pressed
+ * Change direction if its arrow key
+ * Pause and Start in cases : P and S
+ * @param {Object} e - keyboard value
+ */
 function getKeyAndMove(e) {
     var key_code = e.which || e.keyCode;
     // console.log(key_code);
-    if (key_code >= 37 && key_code <= 40) {
-        snake.direction = key_code;
-    }
-
-    if (key_code == 80) {
-        clearInterval(gameInterval);
-    }
-
-    if (key_code == 83) {
-        gameInterval = setInterval(play, CONFIG.INTERVAL);
+    switch (key_code) {
+        case 37:
+            snake.direction = key_code;
+            break;
+        case 38:
+            snake.direction = key_code;
+            break;
+        case 39:
+            snake.direction = key_code;
+            break;
+        case 40:
+            snake.direction = key_code;
+            break;
+        case 80:
+            clearInterval(gameInterval);
+            break;
+        case 83:
+            gameInterval = setInterval(play, CONFIG.INTERVAL);
+            break;
     }
 }
 
+/**
+ * Game progress logic
+ * Starting this function on every interval
+ */
 function play() {
     move();
 }
 
+/**
+ * Move snake to direction
+ * Move every body element to its next one(starting from last)
+ * Move head to its direction
+ */
 function move() {
     let dir = snake.direction;
 
@@ -90,7 +126,12 @@ function move() {
     }
 }
 
-// >=0 <= 510
+/**
+ * Check if element(cube) is in bounds
+ * @param {Object} elem - element to check   
+ * return 1 if in bounds
+ * 0 otherwise
+ */
 function checkBounds(elem) {
     if (elem.offsetLeft < 0 || elem.offsetTop < 0) return 0;
     if (elem.offsetLeft > 510 || elem.offsetTop > 510) return 0;
