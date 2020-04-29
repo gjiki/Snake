@@ -15,7 +15,6 @@ function init() {
 class Snake {
     constructor(default_length) {
         this.body = [];
-        this.length = 0;
         this.score = 0;
         this._direction = 0;
         this._default_length = default_length;
@@ -62,8 +61,6 @@ class Snake {
             let arr = []
             arr.push(cube.offsetLeft);
             arr.push(cube.offsetTop);
-
-            this.length++;
             this.body.push(arr);
         }
     }
@@ -89,12 +86,21 @@ class Snake {
      */
     changeFoodCoordinates() {
         let food = document.getElementById("food");
-        let limit = (CONFIG.BOARD_SIZE / CONFIG.SNAKE_CUBE_DIM);
-        let x = Math.floor(Math.random() * limit);
-        let y = Math.floor(Math.random() * limit);
+        while (true) {
+            let limit = (CONFIG.BOARD_SIZE / CONFIG.SNAKE_CUBE_DIM);
+            let x = Math.floor(Math.random() * limit);
+            let y = Math.floor(Math.random() * limit);
 
-        food.style.left = 0 + x * CONFIG.SNAKE_CUBE_DIM + "px";
-        food.style.top = 0 + y * CONFIG.SNAKE_CUBE_DIM + "px";
+            food.style.left = 0 + x * CONFIG.SNAKE_CUBE_DIM + "px";
+            food.style.top = 0 + y * CONFIG.SNAKE_CUBE_DIM + "px";
+
+            // Food mustn't be on body's coordinate
+            for (let i = 0; i < this.body.length; i++) {
+                if ((food.offsetLeft == this.body[i][0] && food.offsetTop == this.body[i][1])) {
+                    break;;
+                } else return;
+            }
+        }
     }
 
     /**
@@ -199,7 +205,6 @@ function play() {
         let arr = []
         arr.push(newCube.offsetLeft);
         arr.push(newCube.offsetTop);
-        this.length++;
         snake.body.push(arr);
     }
 }
@@ -219,6 +224,7 @@ function move() {
             cube.style.left = snake.body[i - 1][0] + "px";
             cube.style.top = snake.body[i - 1][1] + "px";
 
+            // Save body changes in snake object
             snake.body[i][0] = cube.offsetLeft;
             snake.body[i][1] = cube.offsetTop;
         }
@@ -228,6 +234,7 @@ function move() {
         head.style.left = parseInt(head.offsetLeft) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][0]) + "px";
         head.style.top = parseInt(head.offsetTop) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][1]) + "px";
 
+        // Save body changes in snake object
         snake.body[0][0] = head.offsetLeft;
         snake.body[0][1] = head.offsetTop;
 
