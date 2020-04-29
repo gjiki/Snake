@@ -16,9 +16,24 @@ class Snake {
     constructor(default_length) {
         this.body = [];
         this.length = 0;
-        this.direction = 0;
+        this._direction = 0;
         this._default_length = default_length;
         this._createDefault();
+    }
+
+    /**
+     * Get current direction of snake
+     */
+    getDirection() {
+        return this._direction;
+    }
+
+    /**
+     * Change snake's _direction with direction
+     * @param {type} direction 
+     */
+    changeDirection(direction) {
+        this._direction = direction;
     }
 
     /**
@@ -76,22 +91,24 @@ function getKeyAndMove(e) {
     // console.log(key_code);
     switch (key_code) {
         case 37:
-            snake.direction = key_code;
+            snake.changeDirection(key_code);
             break;
         case 38:
-            snake.direction = key_code;
+            snake.changeDirection(key_code);
             break;
         case 39:
-            snake.direction = key_code;
+            snake.changeDirection(key_code);
             break;
         case 40:
-            snake.direction = key_code;
+            snake.changeDirection(key_code);
             break;
         case 80:
             clearInterval(gameInterval);
             break;
         case 83:
             gameInterval = setInterval(play, CONFIG.INTERVAL);
+            break;
+        default:
             break;
     }
 }
@@ -110,7 +127,7 @@ function play() {
  * Move head to its direction
  */
 function move() {
-    let dir = snake.direction;
+    let dir = snake.getDirection();
 
     if (dir != 0) {
         for (let i = snake.body.length - 1; i >= 1; i--) {
