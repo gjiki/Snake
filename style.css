@@ -2,14 +2,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-.board-section {
-    background-color: black;
+    background-color: darkslateblue;
 }
 
 .board-container {
-    width: 500px;
+    width: 600px;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -21,11 +18,12 @@
 }
 
 .board {
-    width: 320px;
-    height: 320px;
+    width: 420px;
+    height: 420px;
     position: relative;
     border: 10px solid transparent;
     border-color: #657;
+    background-color: white;
 }
 
 .cube {
@@ -51,4 +49,9 @@
 
 input {
     text-align: center;
+    background-color: green;
+}
+
+button {
+    background-color: yellow;
 }
