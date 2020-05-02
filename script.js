@@ -15,7 +15,8 @@ function init() {
 
     document.getElementById('pause').addEventListener('click', pauseClick);
     document.getElementById('start').addEventListener('click', startClick);
-    borderOption = false;
+    document.getElementById('border-option').addEventListener('click', borderOptionClick);
+    borderOption = true;
 }
 
 
@@ -36,6 +37,17 @@ function startClick() {
     if (lastButton != 'start') {
         gameInterval = setInterval(play, CONFIG.INTERVAL);
         lastButton = 'start';
+    }
+}
+
+function borderOptionClick() {
+    let borderOptionElem = document.getElementById("border-option");
+    if (borderOptionElem.innerHTML == 'Border On') {
+        borderOptionElem.innerHTML = 'Border Off';
+        borderOption = false;
+    } else {
+        borderOptionElem.innerHTML = 'Border On';
+        borderOption = true;
     }
 }
 
