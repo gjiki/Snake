@@ -3,6 +3,7 @@ import * as CONFIG from "./config.js";
 var snake = null;
 var gameInterval = null;
 var lastButton = null;
+var borderOption = null;
 
 /**
  * Init fuction to call on window.onLoad
@@ -12,8 +13,9 @@ function init() {
     snake = new Snake(CONFIG.SNAKE_DEFAULT_LENGTH);
     gameInterval = setInterval(play, CONFIG.INTERVAL);
 
-    document.getElementById("pause").addEventListener("click", pauseClick);
-    document.getElementById("start").addEventListener("click", startClick);
+    document.getElementById('pause').addEventListener('click', pauseClick);
+    document.getElementById('start').addEventListener('click', startClick);
+    borderOption = false;
 }
 
 
@@ -21,9 +23,9 @@ function init() {
  * Event handler function for pause button click
  */
 function pauseClick() {
-    if (lastButton != "pause") {
+    if (lastButton != 'pause') {
         clearInterval(gameInterval);
-        lastButton = "pause";
+        lastButton = 'pause';
     }
 }
 
@@ -31,9 +33,9 @@ function pauseClick() {
  * Event handler function for start button click
  */
 function startClick() {
-    if (lastButton != "start") {
+    if (lastButton != 'start') {
         gameInterval = setInterval(play, CONFIG.INTERVAL);
-        lastButton = "start";
+        lastButton = 'start';
     }
 }
 
@@ -68,7 +70,6 @@ class Snake {
     _createDefault() {
         this._createDefaultSnake();
         this.createFood();
-        this.score = 0;
     }
 
     /**
@@ -81,7 +82,7 @@ class Snake {
             let cube = this._createOneCube(cubeId);
 
             cube.style.left = parseInt(cube.offsetLeft) + (this._default_length - i - 1) * CONFIG.SNAKE_CUBE_DIM + "px";
-            cube.style.top = 0 + "px";
+            cube.style.top = 0 + 'px';
 
             let arr = []
             arr.push(cube.offsetLeft);
@@ -96,11 +97,11 @@ class Snake {
      * Add on board
      */
     createFood() {
-        let food = document.createElement("div");
+        let food = document.createElement('div');
         food.setAttribute('class', 'cube');
         food.setAttribute('id', 'food');
 
-        let board = document.getElementById("board");
+        let board = document.getElementById('board');
         board.appendChild(food);
         this.changeFoodCoordinates();
     }
@@ -110,20 +111,25 @@ class Snake {
      * It must be different from snake's body coordinates at that time
      */
     changeFoodCoordinates() {
-        let food = document.getElementById("food");
-        while (true) {
+        let food = document.getElementById('food');
+        let cont = true;
+
+        while (cont) {
             let limit = ((CONFIG.BOARD_SIZE - 2 * CONFIG.BOARD_BORDER) / CONFIG.SNAKE_CUBE_DIM);
             let x = Math.floor(Math.random() * limit);
             let y = Math.floor(Math.random() * limit);
 
-            food.style.left = 0 + x * CONFIG.SNAKE_CUBE_DIM + "px";
-            food.style.top = 0 + y * CONFIG.SNAKE_CUBE_DIM + "px";
+            food.style.left = x * CONFIG.SNAKE_CUBE_DIM + 'px';
+            food.style.top = y * CONFIG.SNAKE_CUBE_DIM + 'px';
 
             // Food mustn't be on body's coordinate
             for (let i = 0; i < this.body.length; i++) {
-                if ((food.offsetLeft == this.body[i][0] && food.offsetTop == this.body[i][1])) {
-                    break;;
-                } else return;
+                if (food.offsetLeft == this.body[i][0] && food.offsetTop == this.body[i][1]) {
+                    break;
+                } else {
+                    cont = false;
+                    break;
+                }
             }
         }
     }
@@ -161,11 +167,11 @@ class Snake {
      * return created cube
      */
     _createOneCube(id) {
-        let cube = document.createElement("div");
+        let cube = document.createElement('div');
         cube.setAttribute('id', id);
         cube.setAttribute('class', 'cube');
 
-        let board = document.getElementById("board");
+        let board = document.getElementById('board');
         board.appendChild(cube);
         return cube;
     }
@@ -220,12 +226,11 @@ function getKeyAndMove(e) {
 function play() {
     move();
 
-    let head = document.getElementById("cube0");
-    let food = document.getElementById("food");
+    let head = document.getElementById('cube0');
+    let food = document.getElementById('food');
 
     if (head.offsetLeft == food.offsetLeft && head.offsetTop == food.offsetTop) {
         snake.score++;
-        snake.changeFoodCoordinates();
 
         let lastCube = document.getElementById('cube' + String(snake.body.length - 1));
         let lastOffsetLeft = lastCube.offsetLeft;
@@ -237,8 +242,8 @@ function play() {
 
         let board = document.getElementById('board');
         board.appendChild(newCube);
-        newCube.style.left = 0 + lastOffsetLeft + "px";
-        newCube.style.top = 0 + lastOffsetTop + "px";
+        newCube.style.left = lastOffsetLeft + 'px';
+        newCube.style.top = lastOffsetTop + 'px';
 
         let arr = []
         arr.push(newCube.offsetLeft);
@@ -246,7 +251,8 @@ function play() {
         snake.body.push(arr);
 
         let score = document.getElementById('score');
-        score.value = "Score : " + snake.score;
+        score.value = 'Score : ' + snake.score;
+        snake.changeFoodCoordinates();
     }
 }
 
@@ -262,8 +268,8 @@ function move() {
         // Move every cube to its next's place
         for (let i = snake.body.length - 1; i >= 1; i--) {
             let cube = document.getElementById('cube' + String(i));
-            cube.style.left = snake.body[i - 1][0] + "px";
-            cube.style.top = snake.body[i - 1][1] + "px";
+            cube.style.left = snake.body[i - 1][0] + 'px';
+            cube.style.top = snake.body[i - 1][1] + 'px';
 
             // Save body changes in snake object
             snake.body[i][0] = cube.offsetLeft;
@@ -271,21 +277,43 @@ function move() {
         }
 
         // get head cube of the snake
-        let head = document.getElementById("cube0");
-        head.style.left = parseInt(head.offsetLeft) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][0]) + "px";
-        head.style.top = parseInt(head.offsetTop) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][1]) + "px";
+        let head = document.getElementById('cube0');
+        head.style.left = parseInt(head.offsetLeft) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][0]) + 'px';
+        head.style.top = parseInt(head.offsetTop) + CONFIG.SNAKE_CUBE_DIM * (DIRECTIONS[dir][1]) + 'px';
 
         // Save body changes in snake object
         snake.body[0][0] = head.offsetLeft;
         snake.body[0][1] = head.offsetTop;
 
         if (!checkBounds(head)) {
-            resetBoard();
+            if (borderOption) {
+                resetBoard();
+            } else {
+                let boardLimit = CONFIG.BOARD_SIZE - 2 * CONFIG.BOARD_BORDER;
+
+                if (snake.body[0][0] >= boardLimit) {
+                    head.style.left = 0 + 'px';
+                } else if (snake.body[0][0] < 0) {
+                    head.style.left = boardLimit - CONFIG.SNAKE_CUBE_DIM + 'px';
+                } else if (snake.body[0][1] >= boardLimit) {
+                    head.style.top = 0 + 'px';
+                } else if (snake.body[0][1] < 0) {
+                    head.style.top = boardLimit - CONFIG.SNAKE_CUBE_DIM + 'px';
+                }
+
+                // Save body changes in snake object
+                snake.body[0][0] = head.offsetLeft;
+                snake.body[0][1] = head.offsetTop;
+            }
         }
 
         if (snake.checkCollision()) {
             resetBoard();
         }
+
+        /*console.log(snake.body[0][0]);
+        console.log(snake.body[0][1]);
+        console.log('\n');*/
     }
 }
 
@@ -307,10 +335,10 @@ function checkBounds(elem) {
  * Remove all cubes, create default starting snake
  */
 function resetBoard() {
-    let board = document.getElementById("board");
-    board.innerHTML = "";
+    let board = document.getElementById('board');
+    board.innerHTML = '';
     snake.resetSnake();
-    document.getElementById('score').value = "Score : 0";
+    document.getElementById('score').value = 'Score : 0';
 }
 
 window.onload = init;
