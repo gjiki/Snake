@@ -1,22 +1,56 @@
 import * as CONFIG from "./config.js";
 
 var snake = null;
+var intervalValue = 0;
 var gameInterval = null;
 var lastButton = null;
-var borderOption = null;
+var changeOptions = true;
 
 /**
  * Init fuction to call on window.onLoad
  */
 function init() {
     onkeydown = getKeyAndMove;
-    snake = new Snake(CONFIG.SNAKE_DEFAULT_LENGTH);
-    gameInterval = setInterval(play, CONFIG.INTERVAL);
 
     document.getElementById('pause').addEventListener('click', pauseClick);
     document.getElementById('start').addEventListener('click', startClick);
     document.getElementById('border-option').addEventListener('click', borderOptionClick);
-    borderOption = true;
+    document.getElementById('easy-level').addEventListener('click', easyLevel);
+    document.getElementById('medium-level').addEventListener('click', mediumLevel);
+    document.getElementById('hard-level').addEventListener('click', hardLevel);
+    document.getElementById('expert-level').addEventListener('click', expertLevel);
+
+    if (localStorage.getItem('currentLevel') == null) localStorage.setItem('currentLevel', 'medium');
+    document.getElementById(localStorage.getItem('currentLevel') + '-level').setAttribute('class', 'level-button');
+
+    if (localStorage.getItem('borderOption') == null) localStorage.setItem('borderOption', 'true');
+    if (localStorage.getItem('borderOption') == 'true') {
+        document.getElementById('border-option').innerHTML = 'Border On';
+    } else {
+        document.getElementById('border-option').innerHTML = 'Border Off';
+    }
+
+    if (localStorage.getItem('score') == null) localStorage.setItem('score', '0');
+
+    switch (localStorage.getItem('currentLevel')) {
+        case 'easy':
+            intervalValue = CONFIG.EASY_INTERVAL;
+            break;
+        case 'medium':
+            intervalValue = CONFIG.MEDIUM_INTERVAL;
+            break;
+        case 'hard':
+            intervalValue = CONFIG.HARD_INTERVAL;
+            break;
+        case 'expert':
+            intervalValue = CONFIG.EXPERT_INTERVAL;
+            break;
+        default:
+            break;
+    }
+
+    snake = new Snake(CONFIG.SNAKE_DEFAULT_LENGTH);
+    gameInterval = setInterval(play, intervalValue);
 }
 
 
@@ -35,26 +69,75 @@ function pauseClick() {
  */
 function startClick() {
     if (lastButton != 'start') {
-        gameInterval = setInterval(play, CONFIG.INTERVAL);
+        gameInterval = setInterval(play, intervalValue);
         lastButton = 'start';
     }
 }
 
 function borderOptionClick() {
-    let borderOptionElem = document.getElementById("border-option");
-    if (borderOptionElem.innerHTML == 'Border On') {
-        borderOptionElem.innerHTML = 'Border Off';
-        borderOption = false;
-    } else {
-        borderOptionElem.innerHTML = 'Border On';
-        borderOption = true;
+    if (changeOptions) {
+        let borderOptionElem = document.getElementById("border-option");
+        if (borderOptionElem.innerHTML == 'Border On') {
+            borderOptionElem.innerHTML = 'Border Off';
+            localStorage.setItem('borderOption', 'false');
+        } else {
+            borderOptionElem.innerHTML = 'Border On';
+            localStorage.setItem('borderOption', 'true');
+        }
+    }
+}
+
+function easyLevel() {
+    if (changeOptions) {
+        document.getElementById('easy-level').setAttribute('class', 'level-button');
+        document.getElementById(localStorage.getItem('currentLevel') + '-level').removeAttribute('class');
+        localStorage.setItem('currentLevel', 'easy');
+        intervalValue = CONFIG.EASY_INTERVAL;
+
+        clearInterval(gameInterval);
+        gameInterval = setInterval(play, intervalValue);
+    }
+}
+
+function mediumLevel() {
+    if (changeOptions) {
+        document.getElementById('medium-level').setAttribute('class', 'level-button');
+        document.getElementById(localStorage.getItem('currentLevel') + '-level').removeAttribute('class');
+        localStorage.setItem('currentLevel', 'medium');
+        intervalValue = CONFIG.MEDIUM_INTERVAL;
+
+        clearInterval(gameInterval);
+        gameInterval = setInterval(play, intervalValue);
+    }
+}
+
+function hardLevel() {
+    if (changeOptions) {
+        document.getElementById('hard-level').setAttribute('class', 'level-button');
+        document.getElementById(localStorage.getItem('currentLevel') + '-level').removeAttribute('class');
+        localStorage.setItem('currentLevel', 'hard');
+        intervalValue = CONFIG.HARD_INTERVAL;
+
+        clearInterval(gameInterval);
+        gameInterval = setInterval(play, intervalValue);
+    }
+}
+
+function expertLevel() {
+    if (changeOptions) {
+        document.getElementById('expert-level').setAttribute('class', 'level-button');
+        document.getElementById(localStorage.getItem('currentLevel') + '-level').removeAttribute('class');
+        localStorage.setItem('currentLevel', 'expert');
+        intervalValue = CONFIG.EXPERT_INTERVAL;
+
+        clearInterval(gameInterval);
+        gameInterval = setInterval(play, intervalValue);
     }
 }
 
 class Snake {
     constructor(default_length) {
         this.body = [];
-        this.score = 0;
         this._direction = 0;
         this._default_length = default_length;
         this._createDefault();
@@ -164,11 +247,9 @@ class Snake {
      * Reset snake values :
      *      Body
      *      Direction
-     *      Score
      */
     resetSnake() {
         this.body = [];
-        this.score = 0;
         this.changeDirection(0);
         this._createDefault();
     }
@@ -209,22 +290,34 @@ function getKeyAndMove(e) {
     // console.log(key_code);
     switch (key_code) {
         case 37:
-            snake.changeDirection(key_code);
+            // left
+            if (snake.getDirection() != 39) snake.changeDirection(key_code);
+            changeOptions = false;
             break;
         case 38:
-            snake.changeDirection(key_code);
+            // up
+            if (snake.getDirection() != 40) snake.changeDirection(key_code);
+            changeOptions = false;
             break;
         case 39:
-            snake.changeDirection(key_code);
+            // right
+            if (snake.getDirection() != 37) snake.changeDirection(key_code);
+            changeOptions = false;
             break;
         case 40:
-            snake.changeDirection(key_code);
+            // down
+            if (snake.getDirection() != 38) snake.changeDirection(key_code);
+            changeOptions = false;
             break;
         case 80:
+            // p
             pauseClick();
+            changeOptions = false;
             break;
         case 83:
+            // s
             startClick();
+            changeOptions = false;
             break;
         default:
             break;
@@ -242,7 +335,8 @@ function play() {
     let food = document.getElementById('food');
 
     if (head.offsetLeft == food.offsetLeft && head.offsetTop == food.offsetTop) {
-        snake.score++;
+        let score = parseInt(localStorage.getItem('score')) + 1;
+        localStorage.setItem('score', String(score));
 
         let lastCube = document.getElementById('cube' + String(snake.body.length - 1));
         let lastOffsetLeft = lastCube.offsetLeft;
@@ -262,8 +356,8 @@ function play() {
         arr.push(newCube.offsetTop);
         snake.body.push(arr);
 
-        let score = document.getElementById('score');
-        score.value = 'Score : ' + snake.score;
+        let scoreElement = document.getElementById('score');
+        scoreElement.value = 'Score : ' + String(score);
         snake.changeFoodCoordinates();
     }
 }
@@ -298,7 +392,7 @@ function move() {
         snake.body[0][1] = head.offsetTop;
 
         if (!checkBounds(head)) {
-            if (borderOption) {
+            if (localStorage.getItem('borderOption') == 'true') {
                 resetBoard();
             } else {
                 let boardLimit = CONFIG.BOARD_SIZE - 2 * CONFIG.BOARD_BORDER;
@@ -347,8 +441,10 @@ function checkBounds(elem) {
  * Remove all cubes, create default starting snake
  */
 function resetBoard() {
+    changeOptions = true;
     let board = document.getElementById('board');
     board.innerHTML = '';
+    localStorage.setItem('score', '0');
     snake.resetSnake();
     document.getElementById('score').value = 'Score : 0';
 }

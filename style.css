@@ -55,3 +55,7 @@ input {
 button {
     background-color: yellow;
 }
+
+.level-button {
+    color: Red;
+}
