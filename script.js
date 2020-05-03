@@ -12,6 +12,7 @@ var changeOptions = true;
 function init() {
     onkeydown = getKeyAndMove;
 
+    // Add event handlers for buttons
     document.getElementById('pause').addEventListener('click', pauseClick);
     document.getElementById('start').addEventListener('click', startClick);
     document.getElementById('border-option').addEventListener('click', borderOptionClick);
@@ -74,6 +75,9 @@ function startClick() {
     }
 }
 
+/*
+ * Event handler function for borderOption button click
+ */
 function borderOptionClick() {
     if (changeOptions) {
         let borderOptionElem = document.getElementById("border-option");
@@ -87,6 +91,9 @@ function borderOptionClick() {
     }
 }
 
+/*
+ * Event handler function for easyLevel button click
+ */
 function easyLevel() {
     if (changeOptions) {
         document.getElementById('easy-level').setAttribute('class', 'level-button');
@@ -99,6 +106,9 @@ function easyLevel() {
     }
 }
 
+/*
+ * Event handler function for mediumLevel button click
+ */
 function mediumLevel() {
     if (changeOptions) {
         document.getElementById('medium-level').setAttribute('class', 'level-button');
@@ -111,6 +121,9 @@ function mediumLevel() {
     }
 }
 
+/*
+ * Event handler function for hardLevel button click
+ */
 function hardLevel() {
     if (changeOptions) {
         document.getElementById('hard-level').setAttribute('class', 'level-button');
@@ -123,6 +136,9 @@ function hardLevel() {
     }
 }
 
+/*
+ * Event handler function for expertLevel button click
+ */
 function expertLevel() {
     if (changeOptions) {
         document.getElementById('expert-level').setAttribute('class', 'level-button');
@@ -135,6 +151,7 @@ function expertLevel() {
     }
 }
 
+// Snake class
 class Snake {
     constructor(default_length) {
         this.body = [];
